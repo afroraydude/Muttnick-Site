@@ -1,0 +1,60 @@
+<?php
+include_once "../config.php";
+
+if (!isset($_SESSION['username'])) :?>
+    <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
+<?php else :
+
+$conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
+
+$post_id = $_GET['post'];
+
+$sql = "SELECT * FROM `afroraydude-site`.`blog` WHERE `id` LIKE '{$post_id}'";
+
+$result = $conn->query($sql) or die($conn->error);
+
+
+
+if ($result->num_rows !== 0) : ?>
+    <?php
+    while($row = $result->fetch_assoc()) {
+        $post_title = $row['title'];
+        $post_content = $row['content'];
+    } ?>
+<?php else :
+    $page_title = "404 Page Not Found";
+
+endif;
+    $page_title = "Edit Post";
+include_once "header.phtml";
+?>
+    <form class="form" action = "<?php echo htmlspecialchars('/updatepost'); ?>" method = "post">
+        <div class="form-group ">
+            <label class="control-label requiredField" for="name">
+                Page Name
+                <span class="asteriskField">
+        *
+       </span>
+            </label>
+            <input class="form-control" id="name" name="name" type="text" value="<?= $post_title ?>"/>
+        </div>
+        <div class="form-group ">
+            <label class="control-label requiredField" for="content">
+                Post Content
+                <span class="asteriskField">
+        *
+       </span>
+            </label>
+            <textarea class="form-control" cols="40" id="content" name="content" rows="10"><?= $post_content ?></textarea>
+        </div>
+        <div class="form-group">
+            <div>
+                <button class="btn btn-primary " name="submit" type="submit">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </form>
+    <a href="/blog">Go to Blog</a>
+
+<?php include_once 'footer.phtml'; endif; ?>

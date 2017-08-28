@@ -1,0 +1,31 @@
+<?php
+include_once "../config.php";
+
+if (!isset($_SESSION['username'])) :?>
+    <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
+<?php else :
+    $page_title = "Edit CSS";
+    include_once "header.phtml";
+    $css = file_get_contents('../public/css/bootstrap-theme.css')
+?>
+    <form class="form" action = "<?php echo htmlspecialchars('/updatecss'); ?>" method = "post">
+
+        <div class="form-group ">
+            <label class="control-label requiredField" for="content">
+                CSS Content
+                <span class="asteriskField">
+        *
+       </span>
+            </label>
+            <textarea class="form-control" cols="40" id="content" name="content" rows="25"><?= $css ?></textarea>
+        </div>
+        <div class="form-group">
+            <div>
+                <button class="btn btn-primary " name="submit" type="submit">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </form>
+
+<?php include_once 'footer.phtml'; endif; ?>

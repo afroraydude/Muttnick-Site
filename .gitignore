@@ -1,0 +1,7 @@
+slim-skeleton/vendor/
+slim-skeleton/\.idea/
+
+\.idea/
+slim-skeleton/public/proxy
+slim-skeleton/public/uploads
+slim-skeleton/public/phpmyadmin

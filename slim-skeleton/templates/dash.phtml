@@ -1,0 +1,83 @@
+<?php
+include_once "../config.php";
+
+if (!isset($_SESSION['username'])) :?>
+    <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
+<?php else :
+
+$conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
+
+$sql = "SELECT * FROM `afroraydude-site`.`pages`";
+$sql2 = "SELECT * FROM `afroraydude-site`.`blog`";
+$sql3 = "SELECT * FROM `afroraydude-site`.`files`";
+
+$result = $conn->query($sql) or die($conn->error);
+
+$page_title = "Dashboard";
+include_once "header.phtml";
+
+// PROGRESS BARS http://progressbarjs.readthedocs.io/en/latest/api/shape/
+?>
+
+    <div class="col-xs-12 col-sm-6">
+      <h1>Dashboard</h1>
+    </div>
+    <div class="hidden-xs col-xs-12 col-sm-6 btn-group right-buttons">
+      <a href="/upload" class="btn btn-primary btn-sm">+ File</a><a href="/dashboard/createpage" class="btn btn-primary btn-sm">+ Page</a><a class="btn btn-primary btn-sm" href="/dashboard/createpost">+ Post</a><a class="btn btn-primary btn-sm" href="/dashboard/editcss">Edit CSS</a>
+    </div>
+    <div class="col-xs-12">
+        <h2>Page Management</h2>
+        <table class="table table-bordered table-hover table-responsive">
+          <thead><tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Title</th>
+            <th>Last modified</th>
+            <th>Options</th>
+          </tr></thead>
+          <tbody>
+          <?php while($row = $result->fetch_assoc()) : ?>
+          <tr>
+              <td><?= $row['id'] ?></td>
+              <td><?= $row['name'] ?></td>
+              <td><?= $row['page-title'] ?></td>
+              <td><?= $row['last-modified'] ?></td>
+              <td><a href="/dashboard/editpage?page=<?= $row['name'] ?>">Edit Page</a> <a href="/delpage?page=<?= $row['name'] ?>">Delete Page</a></td>
+          </tr>
+          <?php endwhile; ?>
+          </tbody>
+        </table>
+    </div>
+
+    <?php
+    $result = $conn->query($sql2) or die($conn->error);
+    ?>
+
+    <div class="col-xs-12">
+        <h2>Post Management</h2>
+        <?php while($row = $result->fetch_assoc()) : ?>
+            <p><?= $row['title'] ?> - <a href="/dashboard/editpost?post=<?= $row['id'] ?>">Edit Post</a> <a href="/delpost?post=<?= $row['id'] ?>">Delete Post</a></p>
+        <?php endwhile; ?>
+    </div>
+
+    <?php
+    $result = $conn->query($sql3) or die($conn->error);
+    ?>
+
+    <div class="col-xs-12">
+      <h2>File Management</h2>
+        <?php while($row = $result->fetch_assoc()) : ?>
+            <a href="/uploads/<?= $row['filename'] ?>">File #<?= $row['id'] ?></a><br>
+        <?php endwhile; ?>
+    </div>
+    <div class="col-xs-12">
+        <h2>Template Management</h2>
+        <?php
+        $templatelist = scandir('../templates');
+        foreach ($templatelist as $templateitem):
+            if ($templateitem !== '.' && $templateitem !== '..'): ?>
+            <a href="/dashboard/edittemplate?template=<?= $templateitem ?>"><?= $templateitem ?></a><br>
+        <?php endif; endforeach; ?>
+    </div>
+<?php include_once 'footer.phtml'; endif; ?>
+c

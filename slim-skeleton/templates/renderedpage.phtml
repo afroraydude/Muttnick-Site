@@ -1,0 +1,45 @@
+<html>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://localhost/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="http://localhost/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://localhost/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <?php $sqlserver = 'localhost';
+        $sqluser = 'afroraydude-site';
+        $sqlpass = 'JO8mNfwkfPxsaWaj';
+        $sqldb = 'afroraydude-site';
+
+        $return = 'Something something something error';
+
+        $conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
+
+        if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+        $sql = "SELECT * FROM `afroraydude-site`.`pages` WHERE `name` LIKE 'test-page'";
+
+        $result = $conn->query($sql) or die($conn->error);
+
+        if ($result->num_rows !== 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $lm_notif = "Page was last modified on ".$row['last-modified'];
+                $return = $row['content'].$lm_notif;
+            }
+        } else {
+            $return = "0 results";
+        }
+        $conn->close();
+    ?>
+    <?php echo $return ?>
+</div>
+</body>
+</html>

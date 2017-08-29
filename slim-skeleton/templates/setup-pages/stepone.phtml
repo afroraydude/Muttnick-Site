@@ -3,9 +3,10 @@ if (!file_exists('../config.php')) {
     copy('../ex-config.php', '../config.php');
 }
 ?>
+<div>
 <h1>Step 1</h1>
 <p>Here you will create your admin user account</p>
-    <form class="form" action = "<?php echo htmlspecialchars('/createall'); ?>" method = "post">
+    <form class="form form-horizontal" action = "<?php echo htmlspecialchars('/createall'); ?>" method = "post">
 
         <!-- Text input-->
         <div class="form-group">
@@ -36,7 +37,5 @@ if (!file_exists('../config.php')) {
             <div class="col-md-2"></div>
             <div class="col-md-10"><input type="checkbox" name="isdocker" value="true">I am running this on Docker</input></div>
     </form>
-
-<div class="alert alert-warning">
     <p>Please make sure the file 'config.php' can be created and edited by PHP! (it's in the same directory as 'ex-config.php')</p>
 </div>

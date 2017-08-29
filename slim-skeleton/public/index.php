@@ -365,7 +365,9 @@ $app->get('/setup-site', function ($request, $response, $args) {
 $app->get('/[{name}]', function ($request, $response, $args) {
     // Sample log message
     //$this->logger->info("Slim-Skeleton '/' route");
-
+    if (!file_exists('../config.php')) {
+        copy('../ex-config.php', '../config.php');
+    }
     // Render index view
   include '../config.php';
   if ($setupcomplete) {

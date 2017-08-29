@@ -1,5 +1,7 @@
 <?php
-copy('../ex-config.php', '../config.php');
+if (!file_exists('../config.php')) {
+    copy('../ex-config.php', '../config.php');
+}
 ?>
 <h1>Step 1</h1>
 <p>Here you will create your admin user account</p>
@@ -30,7 +32,9 @@ copy('../ex-config.php', '../config.php');
                 <button type = "submit" id="submit" name="submit" class="btn btn-success">Create User</button>
             </div>
         </div>
-
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-10"><input type="checkbox" name="isdocker" value="true">I am running this on Docker</input></div>
     </form>
 
 <div class="alert alert-warning">

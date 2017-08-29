@@ -69,6 +69,13 @@ $app->post('/createall', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $user = filter_var($data['user']);
     $pass = filter_var($data['pass']);
+    if(isset($data['isdocker']) !== false) {
+      $data = file('../config.php');
+      $data = array_map(function($data) {
+        return stristr($data,'$sqlserver = \'localhost\';') ? '$sqlserver = \'db\';' . "\n" : $data;
+      }, $data);
+      file_put_contents('../config.php', implode('', $data));
+    }
     $tool = new ContentUpdater();
     $result = $tool->CreateAll($user, $pass);
     if($result == "Success") {
@@ -76,6 +83,7 @@ $app->post('/createall', function (Request $request, Response $response) {
     } else {
       return $result;
     }
+
   }
 });
 

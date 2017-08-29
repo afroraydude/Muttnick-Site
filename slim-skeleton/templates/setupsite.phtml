@@ -11,6 +11,7 @@ if (isset($_GET['step'])) :
     elseif ($step == '3') :
         include_once 'setup-pages/stepthree.phtml';
     endif;
+    echo "</div>";
     include_once 'footer.phtml';
 else :
     echo "<html><head><meta http-equiv='refresh' content='0; url=/setup-site?step=1'></head><body></body></html>";

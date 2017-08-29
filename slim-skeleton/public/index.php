@@ -53,6 +53,32 @@ $app->get('/hello/{name}', function (Request $request, Response $response) {
 
 // https://docs.sentry.io/clients/php/usage/
 
+# default page
+$app->get('', function ($request, $response, $args) {
+  include_once '../config.php';
+  if ($setupcomplete) {
+    return $this->renderer->render($response, 'content.phtml', ['e540cdd1328b2b' => $args['name']]);
+  } else {
+    return $this->renderer->render($response, 'setupsite.phtml', $args);
+  }
+});
+
+$app->post('/createall', function (Request $request, Response $response) {
+  include_once '../config.php';
+  if (!$setupcomplete) {
+    $data = $request->getParsedBody();
+    $user = filter_var($data['user']);
+    $pass = filter_var($data['pass']);
+    $tool = new ContentUpdater();
+    $result = $tool->CreateAll($user, $pass);
+    if($result == "Success") {
+      echo "<html><head><meta http-equiv='refresh' content='0; url=/setup-site?step=2'></head><body></body></html>";
+    } else {
+      return $result;
+    }
+  }
+});
+
 # From editpage route, update page
 $app->post('/updatepage', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
@@ -113,7 +139,7 @@ $app->post('/writepage', function (Request $request, Response $response) {
         $return = $update->WriteContent($page_title, $page_url, $page_data);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/editpage?page={$page_url}'></head><body></body></html>");
+            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard/editpage?page={$page_url}'></head><body></body></html>");
         } else {
             $response->getBody()->write($return);
         }
@@ -328,13 +354,25 @@ $app->get('/logout', function ($request, $response, $args) {
     $response->getBody()->write('<html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>');
 });
 
+$app->get('/setup-site', function ($request, $response, $args) {
+  include_once '../config.php';
+  if (!$setupcomplete) {
+    return $this->renderer->render($response, 'setupsite.phtml', $args);
+  }
+});
+
 # If not already defined, get page content from database through content.phtml
 $app->get('/[{name}]', function ($request, $response, $args) {
     // Sample log message
     //$this->logger->info("Slim-Skeleton '/' route");
 
     // Render index view
+  include '../config.php';
+  if ($setupcomplete) {
     return $this->renderer->render($response, 'content.phtml', $args);
+  } else {
+    return $this->renderer->render($response, 'setupsite.phtml', $args);
+  }
 });
 
 # Move file to uploads page

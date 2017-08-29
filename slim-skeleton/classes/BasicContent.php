@@ -23,26 +23,29 @@ class BasicContent
 
       $return = 'Something something something error';
 
-      $conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
+      // $conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
+      $conn = new PDO("mysql:host=$sqlserver;dbname=$sqldb", $sqluser, $sqlpass);
 
+      /**
       if ($conn->connect_error) {
-          die("Connection failed: " . $conn->connect_error);
+        die("Connection failed: " . $conn->connect_error);
       }
+      */
 
-      $sql = "SELECT * FROM `afroraydude-site`.`pages` WHERE `name` LIKE '%{$page_name}%'";
+      $sql = "SELECT * FROM `afroraydude-site`.`pages` WHERE `name` LIKE '{$page_name}'";
+      $stmt = $conn->query($sql);
+      //$result = $conn->query($sql) or die($conn->error);
 
-      $result = $conn->query($sql) or die($conn->error);
-
-      if ($result->num_rows !== 0) {
+      if ($stmt->rowCount() !== 0) {
           // output data of each row
-          while($row = $result->fetch_assoc()) {
+          while($row =$stmt->fetch(PDO::FETCH_ASSOC)) {
               $lm_notif = "Page was last modified on ".$row['last-modified'];
               $return = $row['content'].$lm_notif;
           }
       } else {
           $return = "0 results";
       }
-      $conn->close();
+      //$conn->close();
       return $return;
   }
 }

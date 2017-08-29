@@ -1,18 +1,18 @@
 <?php
-try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
 $page_title = "Setup Site";
-if (isset($_GET['step'])) {
+if (isset($_GET['step'])) :
     include_once 'header.phtml';
     $step = $_GET['step'];
 
-    if ($step == '1')
+    if ($step == '1') :
         include_once 'setup-pages/stepone.phtml';
-    if ($step == '2')
+    elseif ($step == '2') :
         include_once 'setup-pages/steptwo.phtml';
-    if ($step == '3')
+    elseif ($step == '3') :
         include_once 'setup-pages/stepthree.phtml';
+    endif;
     include_once 'footer.phtml';
-} else {
+else :
     echo "<html><head><meta http-equiv='refresh' content='0; url=/setup-site?step=1'></head><body></body></html>";
-}
-?>
+endif;
+

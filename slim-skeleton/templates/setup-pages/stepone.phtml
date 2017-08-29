@@ -1,2 +1,38 @@
-<?php include_once '../../ex-config.php'; ?>
+<?php
+copy('../ex-config.php', '../config.php');
+?>
 <h1>Step 1</h1>
+<p>Here you will create your admin user account</p>
+    <form class="form" action = "<?php echo htmlspecialchars('/createall'); ?>" method = "post">
+
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Username</label>
+            <div class="col-md-4">
+                <input id="user" name="user" type="text" placeholder="placeholder" class="form-control input-md" required="">
+
+            </div>
+        </div>
+
+        <!-- Password input-->
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="password">Password</label>
+            <div class="col-md-4">
+                <input id="pass" name="pass" type="password" placeholder="placeholder" class="form-control input-md" required="">
+
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+                <button type = "submit" id="submit" name="submit" class="btn btn-success">Create User</button>
+            </div>
+        </div>
+
+    </form>
+
+<div class="alert alert-warning">
+    <p>Please make sure the file 'config.php' can be created and edited by PHP! (it's in the same directory as 'ex-config.php')</p>
+</div>

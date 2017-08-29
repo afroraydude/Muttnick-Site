@@ -1,11 +1,6 @@
 <?php
 // Routes
 
-# default page
-$app->get('', function ($request, $response, $args) {
-    return $this->renderer->render($response, 'content.phtml', ['e540cdd1328b2b' => $args['name']]);
-});
-
 # check to see if slim is installed correctly
 $app->get('/slim-installed', function ($request, $response, $args) {
     // Render index view
@@ -66,6 +61,4 @@ $app->get('/dashboard/editpost', function ($request, $response, $args) {
     return $this->renderer->render($response, 'editpost.phtml', $args);
 });
 
-$app->get('/setup-site', function ($request, $response, $args) {
-    return $this->renderer->render($response, 'setupsite.phtml', $args);
-});
+

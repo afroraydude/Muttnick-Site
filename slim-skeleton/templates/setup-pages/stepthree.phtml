@@ -1,1 +1,11 @@
 <h1>Step 3</h1>
+<?php
+$data = file('../config.php');
+$data = array_map(function($data) {
+  return stristr($data,'$setupcomplete = false;') ? '$setupcomplete = true;' . "\n" : $data;
+}, $data);
+file_put_contents('../config.php', implode('', $data));
+?>
+<p>We just did some stuff in the background to finish things up! Thank you for downloading.
+    Press the button to go to the home page</p>
+<a href="/" class="btn btn-success">Let's go!</a>

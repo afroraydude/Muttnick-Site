@@ -386,7 +386,7 @@ fieldset[disabled] .btn-danger.active {
   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
           */
-  background-color: #ccc;
+  background-color: #eee;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .active > a {
@@ -682,17 +682,21 @@ fieldset[disabled] .btn-danger.active {
 .footer {
   position: absolute;
   bottom: 0;
-  font-weight: 300;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: auto;
-  margin-top: 150px;
+  height: 50px;
+  margin-top: 200px;
   background-color: #f5f5f5;
 }
 
-.container .text-muted {
-  margin: 20px 0;
-  font-weight: 300;
+.footer h1, .footer p {
+  position: absolute;
+  transform: translate(0%, 50%);
+  font-weight: 100;
+}
+
+.container .normpage {
+  height: 100%;
 }
 
 .blog-content {
@@ -712,6 +716,11 @@ fieldset[disabled] .btn-danger.active {
   float: right;
   position: absolute;
   right: 0;
+}
+
+.editor {
+  font-family: monospace, monospace;
+  font-size: 1em;
 }
 
 /*# sourceMappingURL=bootstrap-theme.css.map */

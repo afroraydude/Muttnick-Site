@@ -36,6 +36,28 @@ require __DIR__ . '/../src/routes.php';
 
 $container = $app->getContainer();
 $container['upload_directory'] = __DIR__ . "/uploads";
+/**
+$container['view'] = function ($c) {
+    $view = new \Slim\Views\Twig('../templates/');
+    $view->addExtension(new \Slim\Views\TwigExtension(
+        $c['router'],
+        $c['request']->getUri()
+    ));
+    return $view;
+};*/
+
+// Define Template handler
+$container['view'] = function ($container) {
+    return new \Slim\Views\PhpRenderer('../templates/');
+};
+
+// Custom 404 Page
+$container['notFoundHandler'] = function ($container) {
+    return function ($request, $response) use ($container) {
+        $args = array("name"=>"404");
+        return $container['view']->render($response->withStatus(404), '404.phtml', $args);
+    };
+};
 
 // app stuff
 $app->get('/hello/{name}', function (Request $request, Response $response) {
@@ -251,6 +273,28 @@ $app->get('/delpost', function (Request $request, Response $response) {
     }
 });
 
+$app->get('/delfile', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $name = $_GET['file'];
+    $update = new ContentUpdater();
+    $auth = new Authorization();
+    $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
+    if ($authreturn == "Success") {
+        $return = $update->DeleteFile($name);
+
+        if ($return == "Success") {
+            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard'></head><body></body></html>");
+        } else {
+            $response->getBody()->write($return);
+        }
+
+    } else {
+        $response->getBody()->write("Authorization failed");
+        $newresponse = $response->withStatus(401);
+        return $newresponse;
+    }
+});
+
 # Updates a template on the filesystem, given the template name and content
 $app->post('/updatetemplate', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
@@ -291,9 +335,6 @@ $app->post('/upload', function (Request $request, Response $response) {
             if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
                 $filename = moveUploadedFile($directory, $uploadedFile);
                 $utils = new MyUtils();
-                $mimetype = $utils->GetFileType($uploadedFile);
-                $contentUpdater = new ContentUpdater();
-                $created = $contentUpdater->AddFile($filename, $mimetype);
                 $response->write('Uploaded ' . $filename . '<br/>' . $created);
             }
         }
@@ -385,9 +426,10 @@ $app->get('/[{name}]', function ($request, $response, $args) {
   }
 });
 
-# Move file to uploads page
+# Move file to uploads page and upload data to database
 function moveUploadedFile($directory, UploadedFile $uploadedFile)
 {
+
 
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
     if(function_exists('random_bytes')) {
@@ -399,7 +441,14 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
 
     $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
 
-    return $filename;
+    $filetype = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+    $originalName = pathinfo($uploadedFile->getClientFilename(), PATHINFO_BASENAME);
+
+    $contentUpdater = new ContentUpdater();
+    $created = $contentUpdater->AddFile($originalName, $filename, $filetype);
+
+
+  return $filename;
 }
 
 // Run app

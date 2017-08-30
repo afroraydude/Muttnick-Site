@@ -116,7 +116,7 @@ class ContentUpdater
         return $result;
     }
 
-    function AddFile ($filename, $filetype) {
+    function AddFile ($originalname, $filename, $filetype) {
         try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
 
 
@@ -124,7 +124,7 @@ class ContentUpdater
 
         $filename = mysqli_escape_string($conn, $filename);
 
-        $sql = "INSERT INTO `files` (`filename`, `filetype`) VALUES ('{$filename}', '{$filetype}')";
+        $sql = "INSERT INTO `files` (`filename`,`fullurl`, `filetype`) VALUES ('{$originalname}','{$filename}', '{$filetype}')";
 
         $return = "SOMETHING SOMETHING SOMETHING ERROR";
 
@@ -181,6 +181,26 @@ class ContentUpdater
         } else {
             $result = "Success";
         }
+
+        return $result;
+    }
+
+    function DeleteFile($name) {
+        try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
+
+
+        $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
+
+        $sql = "DELETE FROM `files` WHERE `fullurl` = '{$name}'";
+
+
+        if (!mysqli_query($conn, $sql)) {
+            $result = mysqli_error($conn);
+        } else {
+            $result = "Success";
+        }
+
+        unlink($name);
 
         return $result;
     }

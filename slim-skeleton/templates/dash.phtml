@@ -18,7 +18,19 @@ include_once "header.phtml";
 
 // PROGRESS BARS http://progressbarjs.readthedocs.io/en/latest/api/shape/
 ?>
+<script>
+    // when DOM is ready
+    $(document).ready(function () {
 
+        // Attach Button click event listener
+        $("#myBtn").click(function(){
+
+            // show Modal
+            $('#myModal').modal('show');
+        });
+    });
+
+</script>
     <div class="col-xs-12 col-sm-6">
       <h1>Dashboard</h1>
     </div>
@@ -55,9 +67,24 @@ include_once "header.phtml";
 
     <div class="col-xs-12">
         <h2>Post Management</h2>
-        <?php while($row = $result->fetch_assoc()) : ?>
-            <p><?= $row['title'] ?> - <a href="/dashboard/editpost?post=<?= $row['id'] ?>">Edit Post</a> <a href="/delpost?post=<?= $row['id'] ?>">Delete Post</a></p>
-        <?php endwhile; ?>
+        <table class="table table-bordered table-hover table-responsive">
+            <thead><tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Post Timestamp</th>
+                <th>Options</th>
+            </tr></thead>
+            <tbody>
+            <?php while($row = $result->fetch_assoc()) : ?>
+                <tr>
+                    <td><?= $row['id'] ?></td>
+                    <td><?= $row['title'] ?></td>
+                    <td><?= $row['created_timestamp'] ?></td>
+                    <td><a href="/dashboard/editpost?post=<?= $row['id'] ?>">Edit Post</a> <a href="/delpost?post=<?= $row['id'] ?>">Delete Post</a></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
 
     <?php
@@ -66,18 +93,35 @@ include_once "header.phtml";
 
     <div class="col-xs-12">
       <h2>File Management</h2>
-        <?php while($row = $result->fetch_assoc()) : ?>
-            <a href="/uploads/<?= $row['filename'] ?>">File #<?= $row['id'] ?></a><br>
-        <?php endwhile; ?>
+        <table class="table table-bordered table-hover table-responsive">
+            <thead><tr>
+                <th>ID</th>
+                <th>File Name</th>
+                <th>File URL</th>
+                <th>Upload Date</th>
+                <th>Options</th>
+            </tr></thead>
+            <tbody>
+            <?php while($row = $result->fetch_assoc()) : ?>
+                <tr>
+                    <td><?=$row['id']?></td>
+                    <td><?= $row['filename'] ?></td>
+                    <td>/uploads/<?=$row['fullurl']?></td>
+                    <td><?=$row['upload_timestamp']?></td>
+                    <td><a href="/uploads/<?=$row['fullurl']?>">Go to file</a> <a href="/delfile?file=<?=$row['fullurl']?>">Delete file</a></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+
     </div>
     <div class="col-xs-12">
         <h2>Template Management</h2>
         <?php
         $templatelist = scandir('../templates');
         foreach ($templatelist as $templateitem):
-            if ($templateitem !== '.' && $templateitem !== '..'): ?>
+            if ($templateitem !== '.' && $templateitem !== '..' && strpos($templateitem, 'phtml') == true): ?>
             <a href="/dashboard/edittemplate?template=<?= $templateitem ?>"><?= $templateitem ?></a><br>
         <?php endif; endforeach; ?>
     </div>
 <?php include_once 'footer.phtml'; endif; ?>
-c

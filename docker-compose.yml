@@ -2,8 +2,6 @@ version: '3'
 services:
   db:
     image: mysql:5.7
-    volumes:
-      - ./exampledb:/var/lib/mysql
     environment:
       - "MYSQL_DATABASE=afroraydude-site"
       - "MYSQL_USER=afroraydude-site"

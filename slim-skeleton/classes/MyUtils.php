@@ -8,20 +8,12 @@
 
 class MyUtils
 {
-    function GetFileType($file) {
-        $mimetype = false;
-        /**
-        if(function_exists('finfo_fopen')) {
-            // open with FileInfo
-        } elseif(function_exists('getimagesize')) {
-            // open with GD
-        } elseif(function_exists('exif_imagetype')) {
-           // open with EXIF
-        } elseif(function_exists('mime_content_type')) {
-           $mimetype = mime_content_type($file);
-        }
-        */
-        $mimetype = mime_content_type($file);
-        return $mimetype;
+    function GetFileType(\Slim\Http\UploadedFile $uploadedFile) {
+      $filetype = pathinfo($uploadedFile->getClientMediaType());
+      return $filetype;
+    }
+    function GetOriginialName(\Slim\Http\UploadedFile $uploadedFile) {
+      $originalFileaname = pathinfo($uploadedFile->getClientFilename(), PATHINFO_BASENAME);
+      return $originalFileaname;
     }
 }

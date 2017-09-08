@@ -13,6 +13,7 @@ spl_autoload_register(function ($classname) {
     require(__DIR__ . "/../classes/" . $classname . ".php");
 });
 
+use League\CommonMark\CommonMarkConverter;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Slim\Http\UploadedFile;
@@ -115,11 +116,15 @@ $app->post('/createall', function (Request $request, Response $response) {
 
 # From editpage route, update page
 $app->post('/dashboard/editpage', function (Request $request, Response $response) {
+    include_once "../config.php";
     $data = $request->getParsedBody();
     $id = $_GET['page'];
     $page_title = filter_var($data['name']);
     $page_url = filter_var($data['url']);
     $page_data = filter_var($data['content']);
+    $converter = new CommonMarkConverter();
+    if ($markdownpages == true)
+        $page_data = $converter->convertToHtml($page_data);
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
@@ -140,10 +145,14 @@ $app->post('/dashboard/editpage', function (Request $request, Response $response
 
 # From edit post route, updates the data of a post
 $app->post('/updatepost', function (Request $request, Response $response) {
+    include_once "../config.php";
     $data = $request->getParsedBody();
     $page_id = $_GET['post'];
     $page_title = filter_var($data['name']);
     $page_data = filter_var($data['content']);
+    $converter = new CommonMarkConverter();
+    if ($markdownposts == true)
+        $page_data = $converter->convertToHtml($page_data);
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
@@ -165,10 +174,14 @@ $app->post('/updatepost', function (Request $request, Response $response) {
 
 # From createpage route, place new page data into database
 $app->post('/writepage', function (Request $request, Response $response) {
+    include_once "../config.php";
     $data = $request->getParsedBody();
     $page_title = filter_var($data['name']);
     $page_url = filter_var($data['url']);
     $page_data = filter_var($data['content']);
+    $converter = new CommonMarkConverter();
+    if ($markdownpages == true)
+        $page_data = $converter->convertToHtml($page_data);
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
@@ -176,10 +189,10 @@ $app->post('/writepage', function (Request $request, Response $response) {
         $return = $update->WriteContent($page_title, $page_url, $page_data);
 
         if ($return == "Success") {
-            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$page_url}");
+            return $response->withStatus(302)->withHeader('Location', "/{$page_url}");
         } else {
             $this->flash->addMessage('Error', 'Error while processing: ' . $return);
-            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$page_url}");
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/createpage?url={$page_url}");
         }
 
     } else {
@@ -191,11 +204,15 @@ $app->post('/writepage', function (Request $request, Response $response) {
 
 # from createpost route, add new blog post data into database
 $app->post('/writeblog', function (Request $request, Response $response) {
+    include_once "../config.php";
     $data = $request->getParsedBody();
     $title = filter_var($data['name']);
     $content = filter_var($data['content']);
     $update = new ContentUpdater();
     $auth = new Authorization();
+    $converter = new CommonMarkConverter();
+    if ($markdownposts == true)
+        $content = $converter->convertToHtml($content);
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
     if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $return = $update->WritePost($title, $content);

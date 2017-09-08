@@ -11,3 +11,16 @@ This is the new website for afroraydude.com
 ### Without docker
 Tutorial coming soon
 
+## Credits and documentation
+All software used through composer belong to their respective owners.
+
+For documentation on what this project uses most directly visit these links:
+
+[Slim Framework](https://slimframework.com) - The backbone for this project's code
+
+[HTML to Markdown](https://github.com/thephpleague/html-to-markdown) - Used to 
+make it easier for creating and editing pages/posts
+
+[CommonMark](https://github.com/thephpleague/commonmark) - Turns these edited pages
+into HTML
+

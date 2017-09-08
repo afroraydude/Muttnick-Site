@@ -13,3 +13,6 @@ $key = 'pleasereplacewithahash';
 $siteurl = 'http://127.0.0.1';
 $showlogin = true;
 $setupcomplete = false;
+
+$markdownpages = false;
+$markdownposts = false;

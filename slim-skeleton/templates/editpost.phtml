@@ -1,6 +1,7 @@
 <?php
 include_once "../config.php";
-
+use League\HTMLToMarkdown\HtmlConverter;
+$converter = new HtmlConverter();
 if (!isset($_SESSION['username']) || $_SESSION['role'] == 3) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
@@ -22,6 +23,8 @@ if ($result->num_rows !== 0) : ?>
     while($row = $result->fetch_assoc()) {
         $post_title = $row['title'];
         $post_content = $row['content'];
+        if ($markdownposts == true)
+            $post_content = $converter->convert($post_content);
     } ?>
 <?php else :
     $page_title = "404 Page Not Found";

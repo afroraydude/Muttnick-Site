@@ -1,6 +1,8 @@
 <?php
 include_once "../config.php";
-
+require __DIR__ . '/../vendor/autoload.php';
+use League\HTMLToMarkdown\HtmlConverter;
+$converter = new HtmlConverter();
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
@@ -21,8 +23,10 @@ if ($result->num_rows !== 0) : ?>
         $page_name = $row['page-title'];
         $page_content = $row['content'];
         $page_url = $row['name'];
-
-    } ?>
+        if ($markdownpages == true)
+            $page_content = $converter->convert($page_content);
+    }
+    ?>
 <?php else :
     $page_title = "404 Page Not Found";
 

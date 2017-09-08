@@ -1,6 +1,10 @@
+slim-skeleton/public/bootstrap-4
+slim-skeleton/public/uploads
+docs/.DS_Store
 slim-skeleton/vendor/
 slim-skeleton/\.idea/
 exampledb/
 \.idea/
 slim-skeleton/public/proxy
+slim-skeleton/public/uploads
 slim-skeleton/public/phpmyadmin

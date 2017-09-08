@@ -147,7 +147,7 @@ $app->post('/updatepost', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $return = $update->UpdatePost($page_title, $page_data, $page_id);
         if ($return == "Success") {
             return $response->withStatus(302)->withHeader('Location', "/blog");
@@ -197,7 +197,7 @@ $app->post('/writeblog', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $return = $update->WritePost($title, $content);
 
         if ($return == "Success") {
@@ -372,7 +372,7 @@ $app->get('/delpost', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $return = $update->DeletePost($name);
 
         if ($return == "Success") {

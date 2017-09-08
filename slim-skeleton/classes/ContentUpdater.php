@@ -186,7 +186,7 @@ class ContentUpdater
         $filetype = mysqli_real_escape_string($conn, $filetype);
         $filename = mysqli_escape_string($conn, $filename);
 
-        $sql = "INSERT INTO `files` (`filename`,`fullurl`, `filetype`) VALUES ('{$originalname}','{$filename}', '{$filetype}')";
+        $sql = "INSERT INTO `files` (`filename`,`fullurl`, `filetype`) VALUES ('{$originalname}','{$filename}', 'null')";
 
         $return = "SOMETHING SOMETHING SOMETHING ERROR";
 

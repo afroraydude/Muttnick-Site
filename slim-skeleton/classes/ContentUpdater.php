@@ -26,20 +26,25 @@ class ContentUpdater
 
     return $encrypted;
   }
-    function UpdateContent ($page_title, $page_url, $page_content) {
+    function UpdateContent ($page_id, $page_title, $page_url, $page_content) {
         try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
+
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
 
         $page_title = mysqli_escape_string($conn, $page_title);
         $page_url = mysqli_escape_string($conn, $page_url);
         $page_content = mysqli_escape_string($conn, $page_content);
 
 
-        $sql = "UPDATE `pages` SET `name`='{$page_url}',`page-title`='{$page_title}',`content`='{$page_content}',`last-modified`= current_timestamp WHERE `name` = '{$page_url}'";
+        $sql = "UPDATE `pages` SET `name`='{$page_url}',`page-title`='{$page_title}',`content`='{$page_content}',`last-modified`= current_timestamp WHERE `id` = '{$page_id}'";
 
         $return = "SOMETHING SOMETHING SOMETHING ERROR";
-
+        
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
         } else {
@@ -55,6 +60,11 @@ class ContentUpdater
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        
         $title = mysqli_escape_string($conn, $title);
         $content = mysqli_escape_string($conn, $content);
 
@@ -77,6 +87,11 @@ class ContentUpdater
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        
         $page_title = mysqli_escape_string($conn, $page_title);
         $page_url = mysqli_escape_string($conn, $page_url);
         $page_content = mysqli_escape_string($conn, $page_content);
@@ -100,6 +115,11 @@ class ContentUpdater
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        
         $title = mysqli_escape_string($conn, $title);
         $content = mysqli_escape_string($conn, $content);
 
@@ -122,6 +142,11 @@ class ContentUpdater
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        
         $filename = mysqli_escape_string($conn, $filename);
 
         $sql = "INSERT INTO `files` (`filename`,`fullurl`, `filetype`) VALUES ('{$originalname}','{$filename}', '{$filetype}')";
@@ -157,6 +182,11 @@ class ContentUpdater
 
       $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+      
       $sql = "DELETE FROM `pages` WHERE `name` = '{$name}'";
 
       if (!mysqli_query($conn, $sql)) {
@@ -173,7 +203,10 @@ class ContentUpdater
 
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
-
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
         $sql = "DELETE FROM `blog` WHERE `id` = '{$name}'";
 
         if (!mysqli_query($conn, $sql)) {
@@ -191,6 +224,11 @@ class ContentUpdater
 
         $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
 
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        
         $sql = "DELETE FROM `files` WHERE `fullurl` = '{$name}'";
 
 
@@ -205,10 +243,33 @@ class ContentUpdater
         return $result;
     }
 
+    function CreateUser($username, $password, $role) {
+        include '../config.php';
+        $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+        $password = $this->encrypt($password);
+        $untoken = bin2hex(random_bytes(8)) . $username . bin2hex(random_bytes(8));
+        $token = $this->encrypt($untoken);
+        $sql = "INSERT INTO `users`(`username`, `password`, `token`, `role`) VALUES ('{$username}','{$password}','{$token}',{$role})";
+        if (!mysqli_query($conn, $sql)) {
+            $result = mysqli_error($conn);
+        } else {
+            $result = "Success";
+        }
+        return $result;
+    }
+
     function CreateAll($user, $pass) {
       include '../config.php';
       $conn = new mysqli($sqlserver, $sqluser, $sqlpass, $sqldb);
-      $sql = "CREATE TABLE `afroraydude-site`.`users` ( `id` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(32) NOT NULL , `password` VARCHAR(256) NOT NULL , `token` VARCHAR(1024) NOT NULL , `joined_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `last_login_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
+        if ($conn->connect_errno) {
+            $return = "Connect failed: %s\n" . $conn->connect_error;
+            return $return;
+        }
+      $sql = "CREATE TABLE `afroraydude-site`.`users` ( `id` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(32) NOT NULL UNIQUE , `role` int(3) NOT NULL , `password` VARCHAR(256) NOT NULL , `token` VARCHAR(1024) NOT NULL , `joined_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `last_login_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
       if (!mysqli_query($conn, $sql)) {
         $result = mysqli_error($conn);
       } else {
@@ -237,13 +298,14 @@ class ContentUpdater
       $pass = $this->encrypt($pass);
       $untoken = bin2hex(random_bytes(8)) . $user . bin2hex(random_bytes(8));
       $token = $this->encrypt($untoken);
-      $sql = "INSERT INTO `users`(`username`, `password`, `token`) VALUES ('{$user}','{$pass}','{$token}')";
+      $sql = "INSERT INTO `users`(`username`, `password`, `token`, `role`) VALUES ('{$user}','{$pass}','{$token}',1)";
       if (!mysqli_query($conn, $sql)) {
         $result = mysqli_error($conn);
       } else {
         $result = "Success";
         $_SESSION['token'] = $token;
         $_SESSION['username'] = $user;
+        $_SESSION['role'] = 1;
       }
       return $result;
     }

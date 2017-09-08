@@ -2,7 +2,7 @@
 if (PHP_SAPI == 'cli-server') {
     // To help the built-in PHP dev server, check if the request was actually for
     // something which should probably be served as a static file
-    $url  = parse_url($_SERVER['REQUEST_URI']);
+    $url = parse_url($_SERVER['REQUEST_URI']);
     $file = __DIR__ . $url['path'];
     if (is_file($file)) {
         return false;
@@ -10,7 +10,7 @@ if (PHP_SAPI == 'cli-server') {
 }
 
 spl_autoload_register(function ($classname) {
-    require (__DIR__ . "/../classes/" . $classname . ".php");
+    require(__DIR__ . "/../classes/" . $classname . ".php");
 });
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
@@ -37,14 +37,14 @@ require __DIR__ . '/../src/routes.php';
 $container = $app->getContainer();
 $container['upload_directory'] = __DIR__ . "/uploads";
 /**
-$container['view'] = function ($c) {
-    $view = new \Slim\Views\Twig('../templates/');
-    $view->addExtension(new \Slim\Views\TwigExtension(
-        $c['router'],
-        $c['request']->getUri()
-    ));
-    return $view;
-};*/
+ * $container['view'] = function ($c) {
+ * $view = new \Slim\Views\Twig('../templates/');
+ * $view->addExtension(new \Slim\Views\TwigExtension(
+ * $c['router'],
+ * $c['request']->getUri()
+ * ));
+ * return $view;
+ * };*/
 
 // Define Template handler
 $container['view'] = function ($container) {
@@ -54,9 +54,13 @@ $container['view'] = function ($container) {
 // Custom 404 Page
 $container['notFoundHandler'] = function ($container) {
     return function ($request, $response) use ($container) {
-        $args = array("name"=>"404");
+        $args = array("name" => "404");
         return $container['view']->render($response->withStatus(404), '404.phtml', $args);
     };
+};
+
+$container['flash'] = function () {
+    return new \Slim\Flash\Messages();
 };
 
 // app stuff
@@ -77,56 +81,57 @@ $app->get('/hello/{name}', function (Request $request, Response $response) {
 
 # default page
 $app->get('', function ($request, $response, $args) {
-  include_once '../config.php';
-  if ($setupcomplete) {
-    return $this->renderer->render($response, 'content.phtml', ['e540cdd1328b2b' => $args['name']]);
-  } else {
-    return $this->renderer->render($response, 'setupsite.phtml', $args);
-  }
+    include_once '../config.php';
+    if ($setupcomplete) {
+        return $this->renderer->render($response, 'content.phtml', ['index' => $args['name']]);
+    } else {
+        return $this->renderer->render($response, 'setupsite.phtml', $args);
+    }
 });
 
 $app->post('/createall', function (Request $request, Response $response) {
-  include_once '../config.php';
-  if (!$setupcomplete) {
-    $data = $request->getParsedBody();
-    $user = filter_var($data['user']);
-    $pass = filter_var($data['pass']);
-    if(isset($data['isdocker']) !== false) {
-      $data = file('../config.php');
-      $data = array_map(function($data) {
-        return stristr($data,'$sqlserver = \'localhost\';') ? '$sqlserver = \'db\';' . "\n" : $data;
-      }, $data);
-      file_put_contents('../config.php', implode('', $data));
-    }
-    $tool = new ContentUpdater();
-    $result = $tool->CreateAll($user, $pass);
-    if($result == "Success") {
-      echo "<html><head><meta http-equiv='refresh' content='0; url=/setup-site?step=2'></head><body></body></html>";
-    } else {
-      return $result;
-    }
+    include_once '../config.php';
+    if (!$setupcomplete) {
+        $data = $request->getParsedBody();
+        $user = filter_var($data['user']);
+        $pass = filter_var($data['pass']);
+        if (isset($data['isdocker']) !== false) {
+            $data = file('../config.php');
+            $data = array_map(function ($data) {
+                return stristr($data, '$sqlserver = \'localhost\';') ? '$sqlserver = \'db\';' . "\n" : $data;
+            }, $data);
+            file_put_contents('../config.php', implode('', $data));
+        }
+        $tool = new ContentUpdater();
+        $result = $tool->CreateAll($user, $pass);
+        if ($result == "Success") {
+            return $response->withStatus(302)->withHeader('Location', "/setup-site?step=2");
+        } else {
+            return $result;
+        }
 
-  }
+    }
 });
 
 # From editpage route, update page
-$app->post('/updatepage', function (Request $request, Response $response) {
+$app->post('/dashboard/editpage', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
+    $id = $_GET['page'];
     $page_title = filter_var($data['name']);
     $page_url = filter_var($data['url']);
     $page_data = filter_var($data['content']);
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
-        $return = $update->UpdateContent($page_title, $page_url, $page_data);
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
+        $return = $update->UpdateContent($id, $page_title, $page_url, $page_data);
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/editpage?page={$page_url}'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$id}");
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$id}");
         }
     } else {
-
         $response->getBody()->write("Authorization failed");
         $newresponse = $response->withStatus(401);
         return $newresponse;
@@ -141,12 +146,13 @@ $app->post('/updatepost', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
         $return = $update->UpdatePost($page_title, $page_data);
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/blog'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', "/blog");
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard");
         }
     } else {
 
@@ -165,13 +171,14 @@ $app->post('/writepage', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
         $return = $update->WriteContent($page_title, $page_url, $page_data);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard/editpage?page={$page_url}'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$page_url}");
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$page_url}");
         }
 
     } else {
@@ -189,13 +196,14 @@ $app->post('/writeblog', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
         $return = $update->WritePost($title, $content);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/blog'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/blog');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/createpost");
         }
 
     } else {
@@ -205,6 +213,33 @@ $app->post('/writeblog', function (Request $request, Response $response) {
     }
 });
 
+$app->post('/createuser', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $username = filter_var($data['username']);
+    $password = filter_var($data['password']);
+    $userrole = filter_var($data['userrole']);
+    $update = new ContentUpdater();
+    $auth = new Authorization();
+    $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
+        $return = $update->CreateUser($username, $password, $userrole);
+
+        if ($return == "Success") {
+            return $response->withStatus(302)->withHeader('Location', '/blog');
+        } else {
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/createpost");
+        }
+
+        return $userrole;
+    } else {
+        $response->getBody()->write("Authorization failed");
+        $newresponse = $response->withStatus(401);
+        return $newresponse;
+    }
+});
+
+
 # from editcss route, update the css file
 $app->post('/updatecss', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
@@ -212,13 +247,14 @@ $app->post('/updatecss', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
         $return = $update->UpdateCSS($content);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/editcss");
         }
 
     } else {
@@ -235,13 +271,14 @@ $app->get('/delpage', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
         $return = $update->DeletePage($name);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/dashboard');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard");
         }
 
     } else {
@@ -257,13 +294,14 @@ $app->get('/delpost', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 2) {
         $return = $update->DeletePost($name);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/dashboard');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard");
         }
 
     } else {
@@ -279,13 +317,14 @@ $app->get('/delfile', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
         $return = $update->DeleteFile($name);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/dashboard'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/dashboard');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard");
         }
 
     } else {
@@ -303,13 +342,14 @@ $app->post('/updatetemplate', function (Request $request, Response $response) {
     $auth = new Authorization();
     $update = new ContentUpdater();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
         $return = $update->UpdateTemplate($name, $content);
 
         if ($return == "Success") {
-            $response->getBody()->write("<html><head><meta http-equiv='refresh' content='0; url=/'></head><body></body></html>");
+            return $response->withStatus(302)->withHeader('Location', '/');
         } else {
-            $response->getBody()->write($return);
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/edittemplate?template={$name}");
         }
 
 
@@ -325,11 +365,11 @@ $app->post('/upload', function (Request $request, Response $response) {
     $data = $request->getUploadedFiles();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success") {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $directory = $this->get('upload_directory');
 
         $uploadedFiles = $request->getUploadedFiles();
-        
+
         // handle single input with multiple file uploads
         foreach ($uploadedFiles as $uploadedFile) {
             if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
@@ -348,7 +388,7 @@ $app->post('/upload', function (Request $request, Response $response) {
 
 # Redirect index to homepage
 $app->get('/index', function (Request $request, Response $response) {
-   $response->getBody()->write('<html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>');
+    return $response->withStatus(302)->withHeader('Location', '/');
 });
 
 # Login script
@@ -363,21 +403,26 @@ $app->post('/auth', function (Request $request, Response $response) {
     if ($return == "Success") {
         $_SESSION['username'] = $u;
         # Not setting token, see Authorization class
-        $response->getBody()->write('<html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>');
+        return $response->withStatus(302)->withHeader('Location', '/');
     } else {
-        try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
+        try {
+            include '../config.php';
+        } catch (Exception $e) {
+            include '../ex-config.php';
+        }
 
         /** sentry is a logging program, currently disabled */
         /**
-        $sentryClient = new Raven_Client($raven_key);
-        $sentryClient->install();
-        $sentryClient->captureMessage('Failed Login Attempt', array(
-            'level' => 'warning'
-        ));
-        */
-        $response->getBody()->write($response->getBody()->write('<html><head><meta http-equiv="refresh" content="5; url=/login"></head><body><h1>Login Incorrect</h1><a href="/login">Click here if you are not redirected in 5 seconds</a></body></html>'));
-        $newresponse = $response->withStatus(401);
-        return $newresponse;
+         * $sentryClient = new Raven_Client($raven_key);
+         * $sentryClient->install();
+         * $sentryClient->captureMessage('Failed Login Attempt', array(
+         * 'level' => 'warning'
+         * ));
+         */
+
+        $this->flash->addMessage('Error', 'Login incorrect: ' . $return);
+
+        return $response->withStatus(302)->withHeader('Location', '/login');
     }
 });
 
@@ -399,31 +444,51 @@ $app->get('/logout', function ($request, $response, $args) {
     //$this->logger->info("Slim-Skeleton '/' route");
     unset($_SESSION['username']);
     unset($_SESSION['token']);
+    unset($_SESSION['role']);
 
-    $response->getBody()->write('<html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>');
+    return $response->withStatus(302)->withHeader('Location', '/');
 });
 
 $app->get('/setup-site', function ($request, $response, $args) {
-  include_once '../config.php';
-  if (!$setupcomplete) {
-    return $this->renderer->render($response, 'setupsite.phtml', $args);
-  }
+    include_once '../config.php';
+    if (!$setupcomplete) {
+        return $this->renderer->render($response, 'setupsite.phtml', $args);
+    }
 });
+
+$app->get('/flashsend', function ($req, $res, $args) {
+    // Set flash message for next request
+    $this->flash->addMessage('Test', 'This is a message');
+
+    // Redirect
+    return $res->withStatus(302)->withHeader('Location', '/flashrecieve');
+});
+
+$app->get('/flashrecieve', function ($req, $res, $args) {
+    // Get flash messages from previous request
+    $messages = $this->flash->getMessages();
+    print_r($messages);
+});
+
 
 # If not already defined, get page content from database through content.phtml
 $app->get('/[{name}]', function ($request, $response, $args) {
-    // Sample log message
-    //$this->logger->info("Slim-Skeleton '/' route");
+    $name = $request->getAttribute('name');
+
+    $messages = $this->flash->getMessages();
+    $args = array('name' => $name, 'messages' => $messages);
+
     if (!file_exists('../config.php')) {
         copy('../ex-config.php', '../config.php');
     }
+
     // Render index view
-  include '../config.php';
-  if ($setupcomplete) {
-    return $this->renderer->render($response, 'content.phtml', $args);
-  } else {
-    return $this->renderer->render($response, 'setupsite.phtml', $args);
-  }
+    include '../config.php';
+    if ($setupcomplete) {
+        return $this->renderer->render($response, 'content.phtml', $args);
+    } else {
+        return $this->renderer->render($response, 'setupsite.phtml', $args);
+    }
 });
 
 # Move file to uploads page and upload data to database
@@ -432,7 +497,7 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
 
 
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
-    if(function_exists('random_bytes')) {
+    if (function_exists('random_bytes')) {
         $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
     } else {
         $basename = 'jfaisjdfi';
@@ -448,7 +513,7 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
     $created = $contentUpdater->AddFile($originalName, $filename, $filetype);
 
 
-  return $filename;
+    return $filename;
 }
 
 // Run app

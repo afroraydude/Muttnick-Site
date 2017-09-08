@@ -1,7 +1,7 @@
 <?php
 include_once "../config.php";
 
-if (!isset($_SESSION['username'])) :?>
+if (!isset($_SESSION['username']) || $_SESSION['role'] == 3) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
 
@@ -35,8 +35,22 @@ include_once "header.phtml";
       <h1>Dashboard</h1>
     </div>
     <div class="hidden-xs col-xs-12 col-sm-6 btn-group right-buttons">
-      <a href="/upload" class="btn btn-primary btn-sm">+ File</a><a href="/dashboard/createpage" class="btn btn-primary btn-sm">+ Page</a><a class="btn btn-primary btn-sm" href="/dashboard/createpost">+ Post</a><a class="btn btn-primary btn-sm" href="/dashboard/editcss">Edit CSS</a>
+      <a href="/upload" class="btn btn-primary btn-sm">+ File</a>
+        <a class="btn btn-primary btn-sm" href="/dashboard/createpost">+ Post</a>
+        <?php if ($_SESSION['role'] == 1): ?>
+        <a href="/dashboard/createpage" class="btn btn-primary btn-sm">+ Page</a>
+        <a class="btn btn-primary btn-sm" href="/dashboard/editcss">Edit CSS</a>
+        <?php endif; ?>
     </div>
+    <div clas="col-xs-12">
+        <?php
+        if (empty($messages) == false) :
+            $error = $messages['Error'];
+            ?>
+            <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
+        <?php endif; ?>
+    </div>
+    <?php if ($_SESSION['role'] == 1): ?>
     <div class="col-xs-12">
         <h2>Page Management</h2>
         <table class="table table-bordered table-hover table-responsive">
@@ -54,12 +68,13 @@ include_once "header.phtml";
               <td><?= $row['name'] ?></td>
               <td><?= $row['page-title'] ?></td>
               <td><?= $row['last-modified'] ?></td>
-              <td><a href="/dashboard/editpage?page=<?= $row['name'] ?>">Edit Page</a> <a href="/delpage?page=<?= $row['name'] ?>">Delete Page</a></td>
+              <td><a href="/dashboard/editpage?page=<?= $row['id'] ?>">Edit Page</a> <a href="/delpage?page=<?= $row['name'] ?>">Delete Page</a></td>
           </tr>
           <?php endwhile; ?>
           </tbody>
         </table>
     </div>
+    <?php endif; ?>
 
     <?php
     $result = $conn->query($sql2) or die($conn->error);

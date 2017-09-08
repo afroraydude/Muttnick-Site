@@ -1,7 +1,7 @@
 <?php
 include_once "../config.php";
 
-if (!isset($_SESSION['username'])) :?>
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
     <html>
     <head>
         <meta http-equiv="refresh" content="0; url=/">
@@ -20,6 +20,12 @@ if (!isset($_SESSION['username'])) :?>
     }
     include_once "header.phtml";
     ?>
+    <?php
+    if (empty($messages) == false) :
+        $error = $messages['Error'];
+        ?>
+        <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
+    <?php endif; ?>
     <div class="col-md-8">
         <form class="form" action="<?php echo htmlspecialchars("/updatetemplate?template={$_GET['template']}"); ?>" method="post">
             <div class="form-group">

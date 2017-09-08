@@ -50,17 +50,21 @@ class Authorization
             while ($row = $result->fetch_assoc()) {
                 $encrypted = $row['password'];
                 $token = $row['token'];
+                $role = $row['role'];
             }
             $unencrypted = $this->decrypt($encrypted, $key);
             if ($unencrypted == $password) {
                 $return = "Success";
                 $sql = "UPDATE `users` SET `last_login_timestamp`=CURRENT_TIMESTAMP WHERE `username` = '$username'";
                 $_SESSION['token'] = $token;
+                $_SESSION['role'] = $role;
                 $result = $conn->query($sql);
                 return $return;
+            } else {
+                return "Password is incorrect";
             }
         } else {
-            return "User does not exist or password is incorrect";
+            return "User does not exist";
         }
     }
 

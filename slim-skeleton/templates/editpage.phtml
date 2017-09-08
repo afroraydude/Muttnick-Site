@@ -1,15 +1,15 @@
 <?php
 include_once "../config.php";
 
-if (!isset($_SESSION['username'])) :?>
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
 
 $conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
 
-$page_name = $_GET['page'];
+$id = $_GET['page'];
 
-$sql = "SELECT * FROM `afroraydude-site`.`pages` WHERE `name` LIKE '{$page_name}'";
+$sql = "SELECT * FROM `afroraydude-site`.`pages` WHERE `id` LIKE '{$id}'";
 
 $result = $conn->query($sql) or die($conn->error);
 
@@ -30,7 +30,13 @@ endif;
     $page_title = "Edit Page";
 include_once "header.phtml";
 ?>
-    <form class="form" action = "<?php echo htmlspecialchars('/updatepage'); ?>" method = "post">
+    <?php
+    if (empty($messages) == false) :
+        $error = $messages['Error'];
+        ?>
+        <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
+    <?php endif; ?>
+    <form class="form" action = "<?php echo htmlspecialchars("/dashboard/editpage?page={$id}"); ?>" method = "post">
         <div class="form-group ">
             <label class="control-label requiredField" for="name">
                 Page Name

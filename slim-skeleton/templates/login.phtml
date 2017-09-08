@@ -4,6 +4,12 @@ include_once 'header.phtml';
 ?>
 
 	<form class="form-signin" action = "<?php echo htmlspecialchars('/auth'); ?>" method = "post">
+        <?php
+        if (empty($messages) == false) :
+            $error = $messages['Error'];
+        ?>
+            <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
+        <?php endif; ?>
         <div class="col-sm-6">
             <h2 class="form-signin-heading">Please sign in</h2>
             <label for="inputEmail" class="sr-only">Username</label>

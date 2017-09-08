@@ -2,11 +2,16 @@
 include_once "../config.php";
 $page_title = "Create Page";
 include_once 'header.phtml';
-if (!isset($_SESSION['username'])) :?>
+if (!isset($_SESSION['username']) || $_SESSION['role'] == 3) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
 ?>
-
+    <?php
+    if (empty($messages) == false) :
+        $error = $messages['Error'];
+        ?>
+        <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
+    <?php endif; ?>
     <form class="form" action = "<?php echo htmlspecialchars('/writeblog'); ?>" method = "post">
         <div class="form-group ">
             <label class="control-label requiredField" for="name">

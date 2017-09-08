@@ -141,13 +141,14 @@ $app->post('/dashboard/editpage', function (Request $request, Response $response
 # From edit post route, updates the data of a post
 $app->post('/updatepost', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
+    $page_id = $_GET['post'];
     $page_title = filter_var($data['name']);
     $page_data = filter_var($data['content']);
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
     if ($authreturn == "Success" && $_SESSION['role'] == 2) {
-        $return = $update->UpdatePost($page_title, $page_data);
+        $return = $update->UpdatePost($page_title, $page_data, $page_id);
         if ($return == "Success") {
             return $response->withStatus(302)->withHeader('Location', "/blog");
         } else {
@@ -225,10 +226,10 @@ $app->post('/createuser', function (Request $request, Response $response) {
         $return = $update->CreateUser($username, $password, $userrole);
 
         if ($return == "Success") {
-            return $response->withStatus(302)->withHeader('Location', '/blog');
+            return $response->withStatus(302)->withHeader('Location', '/');
         } else {
             $this->flash->addMessage('Error', 'Error while processing: ' . $return);
-            return $response->withStatus(302)->withHeader('Location', "/dashboard/createpost");
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/createuser");
         }
 
         return $userrole;
@@ -238,6 +239,83 @@ $app->post('/createuser', function (Request $request, Response $response) {
         return $newresponse;
     }
 });
+
+$app->post('/edituser', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $username = filter_var($data['username']);
+    $password = filter_var($data['password']);
+    $userrole = filter_var($data['userrole']);
+    $id = $_GET['user'];
+    $update = new ContentUpdater();
+    $auth = new Authorization();
+    $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
+        $return = $update->EditUser($username, $password, $userrole, $id);
+
+        if ($return == "Success") {
+            return $response->withStatus(302)->withHeader('Location', '/');
+        } else {
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard/edituser?user={$id}");
+        }
+
+        return $userrole;
+    } else {
+        $response->getBody()->write("Authorization failed");
+        $newresponse = $response->withStatus(401);
+        return $newresponse;
+    }
+});
+
+$app->get('/deluser', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $id = $_GET['user'];
+    $update = new ContentUpdater();
+    $auth = new Authorization();
+    $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
+    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
+        $return = $update->DeleteUser($id);
+
+        if ($return == "Success") {
+            return $response->withStatus(302)->withHeader('Location', '/dashboard');
+        } else {
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/dashboard");
+        }
+
+        return $userrole;
+    } else {
+        $response->getBody()->write("Authorization failed");
+        $newresponse = $response->withStatus(401);
+        return $newresponse;
+    }
+});
+
+$app->post('/password', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $username = $_SESSION['username'];
+    $password = filter_var($data['password']);
+    $update = new ContentUpdater();
+    $auth = new Authorization();
+    $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
+    if ($authreturn == "Success") {
+        $return = $update->ChangePassword($username, $password);
+
+        if ($return == "Success") {
+            return $response->withStatus(302)->withHeader('Location', '/logout');
+        } else {
+            $this->flash->addMessage('Error', 'Error while processing: ' . $return);
+            return $response->withStatus(302)->withHeader('Location', "/password");
+        }
+
+        return $userrole;
+    } else {
+        $response->getBody()->write("Authorization failed");
+        $newresponse = $response->withStatus(401);
+        return $newresponse;
+    }
+});
+
 
 
 # from editcss route, update the css file

@@ -2,6 +2,12 @@
 if (!file_exists('../config.php')) {
     copy('../ex-config.php', '../config.php');
 }
+$data = file('../config.php');
+$data = array_map(function($data) {
+    $key = md5(uniqid(''));
+    return stristr($data,'$key = \'pleasereplacewithahash\';') ? '$key = '."'{$key}';" . "\n" : $data;
+}, $data);
+file_put_contents('../config.php', implode('', $data));
 ?>
 <div>
 <h1>Step 1</h1>

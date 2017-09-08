@@ -1,7 +1,40 @@
 <?php
 $page_title = "Setup Site";
-if (isset($_GET['step'])) :
-    include_once 'header.phtml';
+if (isset($_GET['step'])) : ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script>
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-38354391-9', 'auto');
+            ga('send', 'pageview');
+
+        </script>
+        <!-- Mobile optimization -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="../css/bootstrap.css">
+
+        <!-- Our custom theme theme -->
+        <link rel="stylesheet" href="../css/bootstrap-theme.css">
+
+        <title>Afroraydude's Site - <?php echo $page_title; ?></title>
+    </head>
+    <body>
+    <div class="container">
+    <?php
     $step = $_GET['step'];
 
     if ($step == '1') :

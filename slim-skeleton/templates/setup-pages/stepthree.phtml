@@ -5,6 +5,7 @@ $data = array_map(function($data) {
   return stristr($data,'$setupcomplete = false;') ? '$setupcomplete = true;' . "\n" : $data;
 }, $data);
 file_put_contents('../config.php', implode('', $data));
+$data = file('../config.php');
 ?>
 <p>We just did some stuff in the background to finish things up! Thank you for downloading.
     Press the button to create your first page</p>

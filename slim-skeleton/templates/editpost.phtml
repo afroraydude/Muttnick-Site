@@ -9,6 +9,8 @@ $conn = new mysqli($sqlserver,$sqluser,$sqlpass,$sqldb);
 
 $post_id = $_GET['post'];
 
+$post_id = mysqli_real_escape_string($conn, $post_id);
+
 $sql = "SELECT * FROM `afroraydude-site`.`blog` WHERE `id` LIKE '{$post_id}'";
 
 $result = $conn->query($sql) or die($conn->error);
@@ -34,7 +36,7 @@ include_once "header.phtml";
         ?>
         <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
     <?php endif; ?>
-    <form class="form" action = "<?php echo htmlspecialchars('/updatepost'); ?>" method = "post">
+    <form class="form" action = '<?php echo htmlspecialchars("/updatepost?post={$_GET['post']}"); ?>' method = "post">
         <div class="form-group ">
             <label class="control-label requiredField" for="name">
                 Page Name

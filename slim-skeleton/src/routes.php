@@ -90,4 +90,18 @@ $app->get('/dashboard/createuser', function ($request, $response, $args) {
     return $this->renderer->render($response, 'createuser.phtml', $args);
 });
 
+# Edit user
+$app->get('/dashboard/edituser', function ($request, $response, $args) {
+    $messages = $this->flash->getMessages();
+    $args = array('messages'=>$messages);
+    return $this->renderer->render($response, 'edituser.phtml', $args);
+});
+
+# Change password
+$app->get('/password', function ($request, $response, $args) {
+    $messages = $this->flash->getMessages();
+    $args = array('messages'=>$messages);
+    return $this->renderer->render($response, 'changepassword.phtml', $args);
+});
+
 

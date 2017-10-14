@@ -101,7 +101,7 @@ class ContentUpdater
         return $result;
     }
 
-    function WriteContent($page_title, $page_url, $page_content)
+    function WriteContent($page_title, $page_url, $page_content, $username)
     {
         try {
             include '../config.php';
@@ -121,7 +121,7 @@ class ContentUpdater
         $page_url = mysqli_escape_string($conn, $page_url);
         $page_content = mysqli_escape_string($conn, $page_content);
 
-        $sql = "INSERT INTO `pages` (`name`, `page-title`, `content`, `is-fullwidth`) VALUES ('{$page_url}', '{$page_title}', '{$page_content}', FALSE)";
+        $sql = "INSERT INTO `pages` (`name`, `page-title`, `content`, `is-fullwidth`, `author`) VALUES ('{$page_url}', '{$page_title}', '{$page_content}', FALSE, '{$username}')";
 
         $return = "SOMETHING SOMETHING SOMETHING ERROR";
 
@@ -346,7 +346,7 @@ class ContentUpdater
         $password = $this->encrypt($password);
         $untoken = bin2hex(random_bytes(8)) . $username . bin2hex(random_bytes(8));
         $token = $this->encrypt($untoken);
-        $sql = "INSERT INTO `users`(`username`, `password`, `token`, `role`) VALUES ('{$username}','{$password}','{$token}',{$role})";
+        $sql = "INSERT INTO `users`(`username`, `password`, `token`, `role`) VALUES ('{$username}','{$password}','{$token}', {$role});";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
         } else {
@@ -413,27 +413,72 @@ class ContentUpdater
             $return = "Connect failed: %s\n" . $conn->connect_error;
             return $return;
         }
-        $sql = "CREATE TABLE `afroraydude-site`.`users` ( `id` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(32) NOT NULL UNIQUE , `role` int(3) NOT NULL , `password` VARCHAR(256) NOT NULL , `token` VARCHAR(1024) NOT NULL , `joined_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `last_login_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
+        $sql = "CREATE TABLE `users` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `username` varchar(32) NOT NULL,
+            `password` varchar(128) NOT NULL,
+            `role` int(3) NOT NULL,
+            `token` varchar(1024) NOT NULL,
+            `joined_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `last_login_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `username` (`username`),
+            UNIQUE KEY `token` (`token`),
+            UNIQUE KEY `username_2` (`username`),
+            UNIQUE KEY `token_2` (`token`)
+          ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+          ";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
+            return $result;
         } else {
             $result = "Success";
         }
-        $sql = "CREATE TABLE `afroraydude-site`.`blog` ( `id` INT NOT NULL AUTO_INCREMENT , `title` TINYTEXT NOT NULL , `content` TEXT NOT NULL , `created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
+        $sql = "CREATE TABLE `blog` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `title` tinytext NOT NULL,
+            `author` varchar(32) NOT NULL,
+            `content` text NOT NULL,
+            `created_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+          ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+          ";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
+            return $result;
         } else {
             $result = "Success";
         }
-        $sql = "CREATE TABLE `afroraydude-site`.`files` ( `id` INT NOT NULL AUTO_INCREMENT , `filename` VARCHAR(32) NOT NULL , `fullurl` TINYTEXT NOT NULL , `filetype` VARCHAR(10) NOT NULL , `upload_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
+        $sql = "CREATE TABLE `files` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `filename` varchar(32) NOT NULL,
+            `fullurl` tinytext,
+            `filetype` varchar(10) NOT NULL,
+            `upload_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+          ) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+          ";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
+            return $result;
         } else {
             $result = "Success";
         }
-        $sql = "CREATE TABLE `afroraydude-site`.`pages` ( `id` INT NOT NULL AUTO_INCREMENT , `name` TINYTEXT NOT NULL UNIQUE , `page-title` VARCHAR(32) NOT NULL , `is-fullwidth` TINYINT(1) NOT NULL , `content` TEXT NOT NULL , `last-modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = MyISAM;";
+        $sql = "CREATE TABLE `pages` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` varchar(64) NOT NULL,
+            `page-title` varchar(32) NOT NULL,
+            `author` varchar(32) NOT NULL,
+            `is-fullwidth` tinyint(1) NOT NULL DEFAULT '0',
+            `content` text NOT NULL,
+            `last-modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `name` (`name`(32))
+          ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+          ";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
+            return $result;
         } else {
             $result = "Success";
         }
@@ -445,12 +490,14 @@ class ContentUpdater
         $sql = "INSERT INTO `users`(`username`, `password`, `token`, `role`) VALUES ('{$user}','{$pass}','{$token}',1)";
         if (!mysqli_query($conn, $sql)) {
             $result = mysqli_error($conn);
+            return $result;
         } else {
             $result = "Success";
             $_SESSION['token'] = $token;
             $_SESSION['username'] = $user;
             $_SESSION['role'] = 1;
         }
+        $result = "success";
         return $result;
     }
 }

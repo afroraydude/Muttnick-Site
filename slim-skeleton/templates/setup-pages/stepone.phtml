@@ -1,48 +1,106 @@
 <?php
-if (!file_exists('../config.php')) {
-    copy('../ex-config.php', '../config.php');
-}
+copy('../ex-config.php', '../config.php');
+
 $data = file('../config.php');
-$data = array_map(function($data) {
+$data = array_map(function ($data) {
     $key = md5(uniqid(''));
-    return stristr($data,'$key = \'pleasereplacewithahash\';') ? '$key = '."'{$key}';" . "\n" : $data;
+    return stristr($data, '$key = \'pleasereplacewithahash\';') ? '$key = ' . "'{$key}';" . "\n" : $data;
 }, $data);
 file_put_contents('../config.php', implode('', $data));
 ?>
 <div>
-<h1>Step 1</h1>
-<p>Here you will create your admin user account</p>
-    <form class="form form-horizontal" action = "<?php echo htmlspecialchars('/createall'); ?>" method = "post">
+    <h1>Step 1</h1>
+    <p>Here you will create everything necessary for the site</p>
+    <form class="form form-horizontal" action="<?php echo htmlspecialchars('/setup-site'); ?>" method="post">
+        <div>
+            <h2>Database information</h2>
+            <small>Place all information dealing with your MySQL database here</small>
 
-        <!-- Text input-->
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="textinput">Username</label>
-            <div class="col-md-4">
-                <input id="user" name="user" type="text" placeholder="placeholder" class="form-control input-md" required="">
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Database Server</label>
+                <div class="col-md-4">
+                    <input id="sqlserver" name="sqlserver" type="text" placeholder="placeholder"
+                           class="form-control input-md" required>
 
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Database Name</label>
+                <div class="col-md-4">
+                    <input id="sqldb" name="sqldb" type="text" placeholder="placeholder" class="form-control input-md" required>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Database User</label>
+                <div class="col-md-4">
+                    <input id="sqluser" name="sqluser" type="text" placeholder="placeholder"
+                           class="form-control input-md" required>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Database Password</label>
+                <div class="col-md-4">
+                    <input id="sqlpass" name="sqlpass" type="text" placeholder="placeholder"
+                           class="form-control input-md" required>
+
+                </div>
             </div>
         </div>
+        <div>
+            <h2>Site information</h2>
 
-        <!-- Password input-->
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="password">Password</label>
-            <div class="col-md-4">
-                <input id="pass" name="pass" type="password" placeholder="placeholder" class="form-control input-md" required="">
+            <small>Create your site's general information</small>
 
+            <!-- Site name input-->
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Site Name</label>
+                <div class="col-md-4">
+                    <input id="sitename" name="sitename" type="text" placeholder="placeholder" class="form-control input-md"
+                           required>
+
+                </div>
             </div>
-        </div>
 
-        <!-- Button -->
-        <div class="form-group">
-            <div class="col-md-2"></div>
-            <div class="col-md-10">
-                <button type = "submit" id="submit" name="submit" class="btn btn-success">Create User</button>
+            <!-- Username input-->
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Username</label>
+                <div class="col-md-4">
+                    <input id="user" name="user" type="text" placeholder="placeholder" class="form-control input-md"
+                           required>
+
+                </div>
             </div>
+
+            <!-- Password input-->
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="password">Password</label>
+                <div class="col-md-4">
+                    <input id="pass" name="pass" type="password" placeholder="placeholder" class="form-control input-md"
+                           required>
+
+                </div>
+            </div>
+
         </div>
-        <div class="form-group">
-            <div class="col-md-2"></div>
-            <div class="col-md-10"><input type="checkbox" name="isdocker" value="true">I am running this on Docker</input></div>
+        <div>
+            <div class="form-group">
+                <div class="col-md-12"><input type="checkbox" name="isdocker" value="true"> I am running this on Docker
+                    (WARNING: This will override what you set in the database fields)</input></div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <button type="submit" id="submit" name="submit" class="btn btn-success">Create User</button>
+                </div>
+            </div>
         </div>
     </form>
-    <p>Please make sure the file 'config.php' can be created and edited by PHP! (it's in the same directory as 'ex-config.php')</p>
+    <p>Please make sure the file 'config.php' can be created and edited by PHP! (it's in the same directory as
+        'ex-config.php')</p>
 </div>

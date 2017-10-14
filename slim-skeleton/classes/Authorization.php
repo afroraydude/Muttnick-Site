@@ -8,6 +8,24 @@
 
 class Authorization
 {
+    function newEncryption($string) {
+        try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC) , MCRYPT_DEV_URANDOM);
+        $encrypted = base64_encode($iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_128, hash('sha512', $key, true) , $string, MCRYPT_MODE_CBC, $iv));
+
+        return $encrypted;
+    }
+
+    function newDecryption($encrypted)
+    {
+        try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
+        $data = base64_decode($encrypted);
+        $iv = substr($data, 0, mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
+        $decrypted = rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, hash('sha512', $key, true) , substr($data, mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC)) , MCRYPT_MODE_CBC, $iv) , "\0");
+
+        return $decrypted;
+    }
+
     function decrypt($encrypted)
     {
         try { include '../config.php'; } catch (Exception $e) { include '../ex-config.php'; }
@@ -52,7 +70,7 @@ class Authorization
                 $token = $row['token'];
                 $role = $row['role'];
             }
-            $unencrypted = $this->decrypt($encrypted, $key);
+            $unencrypted = $this->decrypt($encrypted);
             if ($unencrypted == $password) {
                 $return = "Success";
                 $sql = "UPDATE `users` SET `last_login_timestamp`=CURRENT_TIMESTAMP WHERE `username` = '$username'";

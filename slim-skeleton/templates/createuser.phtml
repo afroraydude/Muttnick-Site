@@ -52,8 +52,9 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
        </span>
                     <select id="userrole" name="userrole" class="form-control">
                         <option value="1">Admin</option>
-                        <option value="2">Poster</option>
-                        <option value="3">User</option>
+                        <option value="2">Manager</option>
+                        <option value="3">Poster</option>
+                        <option value="4">User</option>
                     </select>
             </div>
 
@@ -72,7 +73,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
                 2: "Weak",
                 3: "Good",
                 4: "Strong"
-            }
+            };
             var password = document.getElementById('password');
             var meter = document.getElementById('password-strength-meter');
             var text = document.getElementById('password-strength-text');

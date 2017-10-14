@@ -90,22 +90,48 @@ $app->get('', function ($request, $response, $args) {
     }
 });
 
-$app->post('/createall', function (Request $request, Response $response) {
+$app->post('/setup-site', function (Request $request, Response $response) {
     include_once '../config.php';
     if (!$setupcomplete) {
         $data = $request->getParsedBody();
+        $sqlserver = filter_var($data['sqlserver']);
+        $sqldb = filter_var($data['sqldb']);
+        $sqluser = filter_var($data['sqluser']);
+        $sqlpass = filter_var($data['sqlpass']);
+        $sitename = filter_var($data['sitename']);
+
         $user = filter_var($data['user']);
         $pass = filter_var($data['pass']);
+        
+        //CreateNewConfig($sqlserver, $sqldb, $sqluser, $sqlpass, $sitename);
         if (isset($data['isdocker']) !== false) {
             $data = file('../config.php');
             $data = array_map(function ($data) {
                 return stristr($data, '$sqlserver = \'localhost\';') ? '$sqlserver = \'db\';' . "\n" : $data;
             }, $data);
             file_put_contents('../config.php', implode('', $data));
+        } else {
+            $data = file('../config.php');
+            $data = array_map(function ($data) use ($sqlserver) {
+                return stristr($data, '$sqlserver = \'localhost\';') ? "\$sqlserver = '{$sqlserver}';" . "\n" : $data;
+            }, $data);
+            $data = array_map(function ($data) use ($sqldb) {
+                return stristr($data, '$sqldb = \'afroraydude-site\';') ? "\$sqldb = '{$sqldb}';" . "\n" : $data;
+            }, $data);
+            $data = array_map(function ($data) use ($sqluser) {
+                return stristr($data, '$sqluser = \'afroraydude-site\';') ? "\$sqluser = '{$sqluser}';" . "\n" : $data;
+            }, $data);
+            $data = array_map(function ($data) use ($sqlpass) {
+                return stristr($data, '$sqlpass = \'secret\';') ? "\$sqlpass = '{$sqlpass}';" . "\n" : $data;
+            }, $data);
+            $data = array_map(function ($data) use ($sitename) {
+                return stristr($data, '$sitename = \'website\';') ? "\$sitename = '{$sitename}';" . "\n" : $data;
+            }, $data);
+            file_put_contents('../config.php', implode('', $data));
         }
         $tool = new ContentUpdater();
         $result = $tool->CreateAll($user, $pass);
-        if ($result == "Success") {
+        if ($result == "success") {
             return $response->withStatus(302)->withHeader('Location', "/setup-site?step=2");
         } else {
             return $result;
@@ -128,7 +154,7 @@ $app->post('/dashboard/editpage', function (Request $request, Response $response
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
         $return = $update->UpdateContent($id, $page_title, $page_url, $page_data);
         if ($return == "Success") {
             return $response->withStatus(302)->withHeader('Location', "/dashboard/editpage?page={$id}");
@@ -156,7 +182,7 @@ $app->post('/updatepost', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 3) {
         $return = $update->UpdatePost($page_title, $page_data, $page_id);
         if ($return == "Success") {
             return $response->withStatus(302)->withHeader('Location', "/blog");
@@ -185,8 +211,8 @@ $app->post('/writepage', function (Request $request, Response $response) {
     $update = new ContentUpdater();
     $auth = new Authorization();
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] == 1) {
-        $return = $update->WriteContent($page_title, $page_url, $page_data);
+    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
+        $return = $update->WriteContent($page_title, $page_url, $page_data, $_SESSION['username']);
 
         if ($return == "Success") {
             return $response->withStatus(302)->withHeader('Location', "/{$page_url}");
@@ -214,7 +240,7 @@ $app->post('/writeblog', function (Request $request, Response $response) {
     if ($markdownposts == true)
         $content = $converter->convertToHtml($content);
     $authreturn = $auth->CheckUser($_SESSION['username'], $_SESSION['token']);
-    if ($authreturn == "Success" && $_SESSION['role'] <= 2) {
+    if ($authreturn == "Success" && $_SESSION['role'] <= 3) {
         $return = $update->WritePost($title, $content);
 
         if ($return == "Success") {
@@ -589,13 +615,12 @@ $app->get('/[{name}]', function ($request, $response, $args) {
 # Move file to uploads page and upload data to database
 function moveUploadedFile($directory, UploadedFile $uploadedFile)
 {
-
-
+    $basename = pathinfo($uploadedFile->getClientFilename(), PATHINFO_BASENAME);
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
     if (function_exists('random_bytes')) {
-        $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
+	$basename = hash("sha1",$basename); // see http://php.net/manual/en/function.random-bytes.php
     } else {
-        $basename = 'jfaisjdfi';
+        $basename = hash("sha1",'jfaisjdfi');
     }
     $filename = sprintf('%s.%0.8s', $basename, $extension);
 

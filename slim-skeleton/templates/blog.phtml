@@ -20,7 +20,7 @@ if ($result->num_rows !== 0) : ?>
     <?php while ($row = $result->fetch_assoc()) :
         $entry = strtotime($row['created_timestamp']); ?>
 
-            <h1><a class="no-color-link" href="/blog/<?= $row['id'] ?>"><?=  $row['title'] ?></a></h1>
+            <h1><?=  $row['title'] ?></h1>
             <small><?= date('M d, y H:i', $entry) ?></small>
             <hr>
             <div class="blog-content">
@@ -30,7 +30,7 @@ if ($result->num_rows !== 0) : ?>
     <?php endwhile; ?>
     </div>
 <?php endif; ?>
-<div class="col-xs-12 col-md-4 blog-padding">
+<div class="hidden-xs hidden-sm col-md-4 blog-padding hidden-XSplit hidden-sm">
     <div class="well">
         <div class="panel-body">
             <h2>About my blog</h2>

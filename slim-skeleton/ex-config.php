@@ -10,9 +10,11 @@ $sqluser = 'afroraydude-site';
 $sqlpass = 'secret';
 $sqldb = 'afroraydude-site';
 $key = 'pleasereplacewithahash';
+
+$sitename = "website";
 $siteurl = 'http://127.0.0.1';
 $showlogin = true;
-$setupcomplete = false;
 
+$setupcomplete = false;
 $markdownpages = false;
-$markdownposts = false;
+$markdownposts = true;

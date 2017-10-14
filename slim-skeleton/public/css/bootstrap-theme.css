@@ -4,7 +4,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * TODO: Flat UI
  */
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400');
+@import url('https://fonts.googleapis.com/css?family=Lato:300|PT+Sans');
 html {
   position: relative;
   min-height: 100%;
@@ -15,6 +15,7 @@ body {
   font-weight: 300;
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  font-size: 18px; /* defautl 14 */
 }
 
 p {
@@ -23,7 +24,12 @@ p {
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: 'PT Sans', sans-serif;
   font-weight: 400;
+}
+
+textarea {
+  font-size: 12px !important;
 }
 
 .btn-default,
@@ -704,14 +710,19 @@ fieldset[disabled] .btn-danger.active {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 50px;
-  margin-top: 200px;
+  margin-top: 350px;
+}
+
+.footer-internal {
   background-color: #272727;
+  width: 100% !important;
+  height: 50px;
 }
 
 .footer h1, .footer p {
+  background-color: #272727;
   position: absolute;
-  transform: translate(0%, 50%);
-  font-weight: 100;
+  transform: translate(0%, 50%)
 }
 
 .container .normpage {
@@ -719,7 +730,7 @@ fieldset[disabled] .btn-danger.active {
 }
 
 .blog-content {
-  padding-bottom: 100px;
+  padding-bottom: 100px
 }
 
 .blog-padding {

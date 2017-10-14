@@ -2,7 +2,7 @@
 include_once "../config.php";
 $page_title = "Create Page";
 include_once 'header.phtml';
-if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
+if (!isset($_SESSION['username']) || $_SESSION['role'] > 2) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
 ?>

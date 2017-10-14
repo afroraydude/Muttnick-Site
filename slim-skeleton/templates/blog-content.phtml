@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 $postid = htmlspecialchars($postid);
 $postid = mysqli_real_escape_string($conn, $postid);
 
-$sql = "SELECT * FROM `afroraydude-site`.`blog` WHERE id = {$postid}";
+$sql = "SELECT * FROM `afroraydude-site`.`blog` WHERE id LIKE %{$postid}%";
 
 $result = $conn->query($sql) or die($conn->error);
 

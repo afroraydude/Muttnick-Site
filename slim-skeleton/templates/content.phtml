@@ -24,16 +24,18 @@ $stmt = $conn->query($sql);
 if (0 !== $stmt->rowCount())  :
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $page_title = $row['page-title'];
+        $page_id = $row['id'];
         $text = $row['content'];
-    } ?>
-<?php else :
+    }
+else :
     $page_title = "404 Page Not Found";
 endif;
 // end header processing
 
 if (!empty($text)) {
     if (empty($messages) == false) :
-        $error = $messages['Error']; ?>
+        $error = $messages['Error'];
+?>
         <div class="alert alert-danger alert-dismissable"><p><?= $error[0] ?></p></div>
     <?php endif;
     include_once 'header.phtml';

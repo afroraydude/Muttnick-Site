@@ -4,10 +4,12 @@
 <?php else : ?>
     <p style="display: none"><?= "Nice inspection" ?></p>
 <?php endif; ?>
-
 <footer class="footer">
-    <div class="container">
-        <p class="text-muted">&copy <?= date('Y') ?> Afroraydude. All Rights Reserved</p>
+<?php if (isset($_SESSION['username']) && $_SESSION['role'] <= 2 && isset($page_id) !== false) : ?>
+<a href="/dashboard/editpage?page=<?= $page_id ?>">Edit Page</a>
+<?php endif; ?>
+    <div class="footer-internal container">
+        <p class="text-muted">&copy <?= date('Y') ?> <?= $sitename ?>. All Rights Reserved</p>
     </div>
 </footer>
 

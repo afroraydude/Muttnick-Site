@@ -65,15 +65,17 @@ $app->get('/upload', function ($request, $response, $args) {
 # See Blog
 $app->get('/blog', function ($request, $response, $args) {
     $messages = $this->flash->getMessages();
-    $args = array('messages'=>$messages);
-    return $this->renderer->render($response, "themes/{$theme}/blog.phtml", $args);
+    $args = array('messages'=>$messages, 'name'=>'blog');
+    return $this->renderer->render($response, "page.php", $args);
 });
 
 # See specific blog post
 $app->get('/blog/[{postid}]', function ($request, $response, $args) {
     $messages = $this->flash->getMessages();
-    $args = array('messages'=>$messages);
-  return $this->renderer->render($response, "themes/{$theme}/blog-content.phtml", $args);
+    $postid = $args['postid'];
+    $args = array('messages'=>$messages, 'name'=>'blog-content', 'postid'=>$postid);
+  include_once '../config.php';
+  return $this->renderer->render($response, "page.php", $args);
 });
 
 # Edit blog post

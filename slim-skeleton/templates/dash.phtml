@@ -20,7 +20,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] == 3) :?>
     $result = $conn->query($sql) or die($conn->error);
 
     $page_title = "Dashboard";
-    include_once "header.phtml";
+    include_once "themes/{$theme}/header.phtml";
 
 // PROGRESS BARS http://progressbarjs.readthedocs.io/en/latest/api/shape/
     ?>
@@ -184,4 +184,4 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] == 3) :?>
                 <a href="/dashboard/edittemplate?template=<?= $templateitem ?>"><?= $templateitem ?></a><br>
             <?php endif; endforeach; ?>
     </div>
-    <?php include_once 'footer.phtml'; endif; endif; ?>
+    <?php include_once 'themes/{$theme}/footer.phtml'; endif; endif; ?>

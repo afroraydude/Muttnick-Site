@@ -18,7 +18,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
         $template = "No data";
         $page_title = "Edit Template";
     }
-    include_once "header.phtml";
+    include_once "themes/{$theme}/header.phtml";
     ?>
     <?php
     if (empty($messages) == false) :
@@ -63,4 +63,4 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
         </div>
     </div>
 
-    <?php include_once 'footer.phtml'; endif; ?>
+    <?php include_once 'themes/{$theme}/footer.phtml'; endif; ?>

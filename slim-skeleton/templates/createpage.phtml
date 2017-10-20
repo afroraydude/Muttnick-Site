@@ -1,7 +1,7 @@
 <?php
 include_once "../config.php";
 $page_title = "Create Page";
-include_once 'header.phtml';
+include_once "themes/{$theme}/header.phtml";
 if (!isset($_SESSION['username']) || $_SESSION['role'] > 2) :?>
     <html><head><meta http-equiv="refresh" content="0; url=/"></head><body></body></html>
 <?php else :
@@ -52,4 +52,4 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] > 2) :?>
             </div>
         </div>
     </form>
-<?php include_once 'footer.phtml'; endif; ?>
+<?php include_once 'themes/{$theme}/footer.phtml'; endif; ?>

@@ -66,14 +66,14 @@ $app->get('/upload', function ($request, $response, $args) {
 $app->get('/blog', function ($request, $response, $args) {
     $messages = $this->flash->getMessages();
     $args = array('messages'=>$messages);
-    return $this->renderer->render($response, 'blog.phtml', $args);
+    return $this->renderer->render($response, "themes/{$theme}/blog.phtml", $args);
 });
 
 # See specific blog post
 $app->get('/blog/[{postid}]', function ($request, $response, $args) {
     $messages = $this->flash->getMessages();
     $args = array('messages'=>$messages);
-  return $this->renderer->render($response, 'blog-content.phtml', $args);
+  return $this->renderer->render($response, "themes/{$theme}/blog-content.phtml", $args);
 });
 
 # Edit blog post

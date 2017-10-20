@@ -8,3 +8,5 @@ exampledb/
 slim-skeleton/public/proxy
 slim-skeleton/public/uploads
 slim-skeleton/public/phpmyadmin
+
+slim-skeleton/config\.php

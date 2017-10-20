@@ -1,4 +1,4 @@
-# Muttnick-Dev
+# New Afroraydude website
 This is the new website for afroraydude.com
 
 ## Installation
@@ -30,4 +30,4 @@ make it easier for creating and editing pages/posts
 [CommonMark](https://github.com/thephpleague/commonmark) - Turns these edited pages
 into HTML
 
-Software (c) 2017 Jetpack Game Studios
+Software (c) 2017 Afroraydude

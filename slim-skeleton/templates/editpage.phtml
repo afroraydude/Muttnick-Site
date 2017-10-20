@@ -32,7 +32,7 @@ if ($result->num_rows !== 0) : ?>
 
 endif;
     $page_title = "Edit Page";
-include_once "header.phtml";
+    include_once "themes/{$theme}/header.phtml";
 ?>
     <?php
     if (empty($messages) == false) :
@@ -78,4 +78,4 @@ include_once "header.phtml";
     </form>
     <a href="/<?php echo $page_url ?>">Go to page</a>
 
-<?php include_once 'footer.phtml'; endif; ?>
+<?php include_once 'themes/{$theme}/footer.phtml'; endif; ?>

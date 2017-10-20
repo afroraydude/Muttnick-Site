@@ -359,7 +359,14 @@ $app->post('/password', function (Request $request, Response $response) {
     }
 });
 
-
+$app->post('/reset', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $email = filter_var($data['email']);
+    $update = new ContentUpdater();
+    if(true) {
+        $return = $update->ResetRequest($email);
+    }
+});
 
 # from editcss route, update the css file
 $app->post('/updatecss', function (Request $request, Response $response) {
@@ -606,7 +613,7 @@ $app->get('/[{name}]', function ($request, $response, $args) {
     // Render index view
     include '../config.php';
     if ($setupcomplete) {
-        return $this->renderer->render($response, 'content.phtml', $args);
+        return $this->renderer->render($response, "page.php", $args);
     } else {
         return $this->renderer->render($response, 'setupsite.phtml', $args);
     }

@@ -14,6 +14,7 @@ $key = 'pleasereplacewithahash';
 $sitename = "website";
 $siteurl = 'http://127.0.0.1';
 $showlogin = true;
+$theme = "default"
 
 $setupcomplete = false;
 $markdownpages = false;

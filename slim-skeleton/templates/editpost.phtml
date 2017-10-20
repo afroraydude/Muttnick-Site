@@ -30,8 +30,7 @@ if ($result->num_rows !== 0) : ?>
     $page_title = "404 Page Not Found";
 
 endif;
-    $page_title = "Edit Post";
-include_once "header.phtml";
+include_once "themes/{$theme}/header.phtml";
 ?>
     <?php
     if (empty($messages) == false) :
@@ -68,4 +67,4 @@ include_once "header.phtml";
     </form>
     <a href="/blog">Go to Blog</a>
 
-<?php include_once 'footer.phtml'; endif; ?>
+<?php include_once 'themes/{$theme}/footer.phtml'; endif; ?>

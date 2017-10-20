@@ -1,8 +1,7 @@
 <?php
-include_once "../config.php";
 $page_title = "Edit User";
 include_once "../config.php";
-include_once 'header.phtml';
+include_once "themes/{$theme}/header.phtml";
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
     <html>
     <head>
@@ -101,4 +100,4 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) :?>
             });
         </script>
     </form>
-    <?php include_once 'footer.phtml'; endif; ?>
+    <?php include_once 'themes/{$theme}/footer.phtml'; endif; ?>
